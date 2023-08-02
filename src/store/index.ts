@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { TypedUseSelectorHook } from "react-redux";
 import { errorReducer } from "./error.reducer";
 import { loadingReducer } from "./loading.reducer";
-import { userReducer } from "./user.reducer";
+import userReducer from "./user.reducer";
 
 const store = configureStore({
   reducer: {
@@ -11,6 +11,13 @@ const store = configureStore({
     loading: loadingReducer,
     user: userReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ["user/fetchUser"],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

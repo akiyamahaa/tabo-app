@@ -91,10 +91,10 @@ const BookDetail = () => {
         <VStack w={"100%"} height={500}>
           <Image
             source={require("../../assets/bg_book.png")}
+            contentFit="contain"
             style={{
               width: "100%",
               height: 500,
-              resizeMode: "contain",
               position: "absolute",
             }}
           />

@@ -1,17 +1,22 @@
 import { StyleSheet } from "react-native";
 import React from "react";
 import { Center, HStack, Heading, Spinner } from "native-base";
+import { RootState, useAppSelector } from "../store";
 
 const LoadingOverlay = () => {
+  const loading = useAppSelector((state: RootState) => state.loading.isLoading);
+
   return (
-    <Center flex={1} style={styles.container}>
-      <HStack space={2} justifyContent="center">
-        <Spinner accessibilityLabel="Loading posts" />
-        <Heading color="primary.500" fontSize="md">
-          Loading
-        </Heading>
-      </HStack>
-    </Center>
+    loading && (
+      <Center flex={1} style={styles.container}>
+        <HStack space={2} justifyContent="center">
+          <Spinner accessibilityLabel="Loading posts" color={"primary.Main"} />
+          <Heading color={"primary.Main"} fontSize="md">
+            Loading
+          </Heading>
+        </HStack>
+      </Center>
+    )
   );
 };
 
@@ -23,6 +28,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 1,
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
 });

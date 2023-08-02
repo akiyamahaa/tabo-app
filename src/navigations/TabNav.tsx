@@ -12,9 +12,10 @@ import Profile from "../screens/Profile";
 import { useTheme } from "native-base";
 import Favourite from "../screens/Favourite";
 import Search from "../screens/Search";
+import { BottomTabsParams } from "./config";
 // import { BottomTabsParams } from "./types";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<BottomTabsParams>();
 
 const TabNav = () => {
   const { colors } = useTheme();
@@ -46,7 +47,7 @@ const TabNav = () => {
         }}
       />
       <Tab.Screen
-        name="Wishlist"
+        name="Favourite"
         component={Favourite}
         options={{
           tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
