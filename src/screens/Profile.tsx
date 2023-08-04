@@ -57,7 +57,7 @@ const Profile = () => {
     phone: user?.phone || "",
     bio: user?.bio || "",
   });
-  const [image, setImage] = useState<string | null>("" || null);
+  const [image, setImage] = useState<string | null>(user?.avatar || null);
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
   const [edit, setEdit] = useState(false);
 

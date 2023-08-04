@@ -2,13 +2,18 @@ import { StyleSheet } from "react-native";
 import React, { useCallback } from "react";
 import { Box, HStack, Text, ScrollView, FlatList } from "native-base";
 import BookCard from "./BookCard";
+import { IBook } from "../types/book";
 
-const GroupBook = () => {
+interface Props {
+  books: IBook[];
+}
+const GroupBook = (props: Props) => {
+  const { books } = props;
   const renderCardItem = useCallback(
-    ({ item, index }: any) => <BookCard />,
+    ({ item, index }: any) => <BookCard book={item} />,
     []
   );
-  const keyExtractor = useCallback((item: any) => item.phone, []);
+  const keyExtractor = useCallback((item: any) => item.id, []);
 
   return (
     <Box>
@@ -16,7 +21,7 @@ const GroupBook = () => {
         Favorites
       </Text>
       <FlatList
-        data={[1, 2, 3, 4, 5]}
+        data={books}
         horizontal
         ItemSeparatorComponent={() => <Box style={{ width: 20, height: 10 }} />}
         renderItem={renderCardItem}

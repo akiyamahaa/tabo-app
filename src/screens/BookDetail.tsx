@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Center,
@@ -13,6 +13,12 @@ import {
 import Header from "../components/Header";
 import { Image } from "expo-image";
 import { Star1, Eye } from "iconsax-react-native";
+import { useRoute } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParams } from "../navigations/config";
+import { IBook } from "../types/book";
+import { firebaseDB } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const Comment = () => {
   const { colors } = useTheme();
@@ -83,26 +89,73 @@ const Comment = () => {
   );
 };
 
-const BookDetail = () => {
+const convertBackgroundImage = (image: string) => {
+  return (
+    <Box>
+      <Image
+        source={require("../../assets/book_image.png")}
+        contentFit="cover"
+        style={{
+          width: "100%",
+          height: 500,
+          position: "absolute",
+        }}
+      />
+    </Box>
+  );
+};
+
+type Props = NativeStackScreenProps<RootStackParams, "BookDetail">;
+
+const BookDetail = ({ navigation, route }: Props) => {
+  const [book, setBook] = useState<IBook>();
+  const bookId = route.params.bookId;
   const { colors } = useTheme();
+
+  const fetchBook = async () => {
+    const bookRef = doc(firebaseDB, "books", bookId);
+    const bookSnap = await getDoc(bookRef);
+    setBook(bookSnap.data() as IBook);
+  };
+  useEffect(() => {
+    fetchBook();
+  }, []);
+
   return (
     <Box flex={1} bg={"#fff"}>
       <ScrollView>
         <VStack w={"100%"} height={500}>
-          <Image
-            source={require("../../assets/bg_book.png")}
-            contentFit="contain"
-            style={{
-              width: "100%",
-              height: 500,
-              position: "absolute",
-            }}
-          />
+          <Box
+            position={"absolute"}
+            width={"100%"}
+            height={500}
+            overflow={"hidden"}
+            backgroundColor={"amber.100"}
+          >
+            <Image
+              source={{ uri: book?.image }}
+              contentFit="cover"
+              style={{
+                width: "100%",
+                height: 800,
+                // position: "absolute",
+              }}
+            />
+            {/* Overlay image */}
+            <Box
+              width={"100%"}
+              height={500}
+              position={"absolute"}
+              backgroundColor={colors.gray[100]}
+              opacity={0.75}
+            />
+          </Box>
           <Header title="" showLike={true} />
           <Center mt={4}>
             <Image
-              source={require("../../assets/book_image.png")}
+              source={{ uri: book?.image }}
               style={{ width: 160, height: 210 }}
+              contentFit="fill"
             />
           </Center>
         </VStack>
@@ -142,13 +195,10 @@ const BookDetail = () => {
             </HStack>
           </HStack>
         </Box>
-        <VStack px={6} mt={6}>
+        <VStack px={6} mt={10}>
           {/* Description */}
           <Text color={"grey.900"} fontSize={14}>
-            Lorem ipsum dolor sit amet consectetur. Lacus amet orci arcu vel
-            tristique in erat. Id egestas a lectus vitae. Eget condimentum magna
-            proin eget nibh amet turpis nunc. Tempus eget tincidunt semper amet
-            tortor.
+            {book?.description}
           </Text>
           <Divider my={6} />
           <VStack>

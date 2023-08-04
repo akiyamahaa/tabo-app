@@ -4,13 +4,23 @@ import { Box, HStack, Text, VStack, useTheme } from "native-base";
 import { Image } from "expo-image";
 import { Star1 } from "iconsax-react-native";
 import { useNavigation } from "@react-navigation/native";
+import { IBook } from "../types/book";
 
-const BookCard = (props: any) => {
+interface Props {
+  book: IBook;
+  width?: number | string;
+  height?: number | string;
+  mb?: number;
+}
+
+const BookCard = (props: Props) => {
   const { colors } = useTheme();
-  const { width = 140, height = 210, mb = 0 } = props;
+  const { width = 140, height = 210, mb = 0, book } = props;
   const navigation = useNavigation<any>();
   const navigateDetail = () => {
-    navigation.navigate("BookDetail");
+    navigation.navigate("BookDetail", {
+      bookId: book.id,
+    });
   };
   return (
     <Box width={width} mb={mb}>
@@ -18,7 +28,7 @@ const BookCard = (props: any) => {
         <VStack>
           <Box position={"relative"} bgColor={"amber.100"} mb={2.5}>
             <Image
-              source={require("../../assets/book_image.png")}
+              source={{ uri: book.image }}
               style={{ width: "100%", height }}
               contentFit="cover"
             />
@@ -49,10 +59,10 @@ const BookCard = (props: any) => {
             </HStack>
           </Box>
           <Text fontSize={14} fontWeight={"semibold"} color={"grey.900"}>
-            Emerson Ekstrom Bothman
+            {book.name}
           </Text>
           <Text fontSize={12} fontWeight={"medium"} color={"grey.500"}>
-            Corey Septimus
+            {book.author}
           </Text>
         </VStack>
       </TouchableOpacity>

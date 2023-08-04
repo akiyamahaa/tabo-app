@@ -1,11 +1,41 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { Box, Button, Center, HStack, Image, ScrollView, Text, VStack } from "native-base";
+import {
+  Box,
+  Button,
+  Center,
+  HStack,
+  ScrollView,
+  Text,
+  VStack,
+} from "native-base";
 import BookCard from "../components/BookCard";
 import GroupBook from "../components/GroupBook";
+import { useAppSelector } from "../store";
+import { Image } from "expo-image";
+import { collection, getDocs } from "firebase/firestore";
+import { firebaseDB } from "../firebase";
+import { IBook } from "../types/book";
 
 const Home = () => {
+  const user = useAppSelector((state) => state.user.user);
+  const [listBook, setListBook] = useState<IBook[]>([]);
+
+  const fetchAllBook = async () => {
+    // TODO: Define type for book
+    const queryBook = await getDocs(collection(firebaseDB, "books"));
+    const books: IBook[] = [];
+    queryBook.forEach((doc: any) => {
+      books.push({ ...doc.data(), id: doc.id });
+    });
+    setListBook(books);
+  };
+
+  useEffect(() => {
+    fetchAllBook();
+  }, []);
+
   return (
     <ScrollView flex={1} bgColor={"#fff"}>
       <Box px={2}>
@@ -17,7 +47,7 @@ const Home = () => {
         >
           <VStack alignItems={"center"}>
             <Text fontWeight={"bold"} fontSize={24} color="white">
-              Hello, Marcus Curtis!
+              Hello, {user?.name}!
             </Text>
             <Text fontSize={16} color={"white"} textAlign={"center"}>
               Which book suits your {"\n"} current mood?
@@ -28,26 +58,38 @@ const Home = () => {
       <Box borderRadius={8} mx={6} p={4} style={styles.boxShadow} shadow={3}>
         <VStack space={3}>
           <HStack alignItems={"center"}>
-            <Image source={require("../../assets/avt.png")} w={16} h={16} />
+            <Box
+              bgColor={"amber.200"}
+              width={16}
+              height={16}
+              borderRadius={64}
+              overflow={"hidden"}
+            >
+              <Image
+                source={
+                  user?.avatar
+                    ? { uri: user?.avatar }
+                    : require("../../assets/defaultAvatar.jpeg")
+                }
+                contentFit="fill"
+                style={{ width: 64, height: 64 }}
+              />
+            </Box>
             <Text fontWeight={"bold"} fontSize={24} color={"grey.900"} ml={4}>
-              Marcus Curtis
+              {user?.name}
             </Text>
           </HStack>
-          <Text fontSize={14}>
-            Lorem ipsum dolor sit amet consectetur. At vulputate vulputate id
-            suscipit morbi. Tristique dolor dictum convallis nisl
-          </Text>
+          <Text fontSize={14}>{user?.bio}</Text>
         </VStack>
       </Box>
       <VStack px={6} mt={8} space={5}>
-        <GroupBook />
-        <GroupBook />
-
+        <GroupBook books={listBook} />
+        <GroupBook books={listBook} />
       </VStack>
     </ScrollView>
   );
 };
-  
+
 export default Home;
 
 const styles = StyleSheet.create({

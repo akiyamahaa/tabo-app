@@ -7,4 +7,5 @@ export interface IUser {
   avatarName?: string;
   bio?: string;
   phone?: string;
+  favourite?: Array<string>;
 }
