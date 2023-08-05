@@ -12,11 +12,6 @@ export interface IComment {
   bookId: string;
   userId: string;
   comment: string;
-}
-
-export interface IRating {
-  id: string;
-  bookId: string;
-  userId: string;
   rating: number;
+  timestamp: Date;
 }

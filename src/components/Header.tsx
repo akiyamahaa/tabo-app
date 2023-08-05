@@ -6,7 +6,13 @@ import { useNavigation } from "@react-navigation/native";
 const Header = (props: any) => {
   const navigation = useNavigation<any>();
   const { colors } = useTheme();
-  const { showBack = true, showLike = false, title, onLike = () => {} } = props;
+  const {
+    showBack = true,
+    showLike = false,
+    title,
+    onLike = () => {},
+    checkLike = false,
+  } = props;
   return (
     <Box px={6}>
       <Box mt={12}></Box>
@@ -23,7 +29,11 @@ const Header = (props: any) => {
         </Text>
         {showLike ? (
           <TouchableOpacity onPress={onLike}>
-            <HeartTick size="32" color={colors.grey[500]} />
+            <HeartTick
+              size="32"
+              color={colors.grey[500]}
+              variant={checkLike ? "Bold" : "Linear"}
+            />
           </TouchableOpacity>
         ) : (
           <Box size={8} />

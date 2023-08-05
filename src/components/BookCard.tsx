@@ -16,7 +16,9 @@ interface Props {
 const BookCard = (props: Props) => {
   const { colors } = useTheme();
   const { width = 140, height = 210, mb = 0, book } = props;
+  console.log("🚀 ~ file: BookCard.tsx:19 ~ BookCard ~ book:", book)
   const navigation = useNavigation<any>();
+  
   const navigateDetail = () => {
     navigation.navigate("BookDetail", {
       bookId: book.id,

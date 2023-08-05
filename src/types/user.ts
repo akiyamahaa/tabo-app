@@ -5,7 +5,7 @@ export interface IUser {
   password: string;
   avatar?: string;
   avatarName?: string;
-  bio?: string;
-  phone?: string;
-  favourite?: Array<string>;
+  bio: string;
+  phone: string;
+  favourite: Array<string>;
 }

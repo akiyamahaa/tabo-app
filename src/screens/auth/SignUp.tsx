@@ -51,6 +51,9 @@ const SignUp = ({ navigation, route }: Props) => {
         name,
         password,
         avatar: "",
+        bio: "",
+        phone: "",
+        favourite: [],
       };
       await setDoc(doc(firebaseDB, "users", user.uid), profileRegister);
       await AsyncStorage.setItem("uid", user.uid);
