@@ -17,7 +17,7 @@ import { Star1, Eye } from "iconsax-react-native";
 import { useRoute } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "../navigations/config";
-import { IBook, IComment } from "../types/book";
+import { IBook, IComment, ICommentForm } from "../types/book";
 import { firebaseDB } from "../firebase";
 import {
   collection,
@@ -33,6 +33,7 @@ import { useAppDispatch, useAppSelector } from "../store";
 import { fetchUser } from "../store/user.reducer";
 import { IUser } from "../types/user";
 import Comment from "../components/Comment";
+import ModalRatingBook from "../components/ModalRatingBook";
 
 type Props = NativeStackScreenProps<RootStackParams, "BookDetail">;
 
@@ -43,10 +44,12 @@ const BookDetail = ({ navigation, route }: Props) => {
   const [book, setBook] = useState<IBook | null>(null);
   const [listComment, setListComment] = useState<IComment[]>([]);
   const [rating, setRating] = useState<number>(0);
+  const [showModal, setShowModal] = useState(false);
+  const [isNotCommented, setIsNotCommented] = useState<boolean | null>(null);
   const dispatch = useAppDispatch();
   const { colors } = useTheme();
 
-  const fetchBook = async () => {
+  const fetchBookDetail = async () => {
     const bookRef = doc(firebaseDB, "books", bookId);
     const bookSnap = await getDoc(bookRef);
     setBook(bookSnap.data() as IBook);
@@ -65,41 +68,45 @@ const BookDetail = ({ navigation, route }: Props) => {
     const commentSnapShot = await getDocs(q);
     const comments: IComment[] = [];
     commentSnapShot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
       comments.push(doc.data() as any);
     });
+    // check user comment
+    const check = comments.filter((cmt) => cmt.userId == user?.id);
+    setIsNotCommented(!Boolean(check.length));
     setListComment(comments);
   };
 
   useEffect(() => {
-    fetchBook();
+    fetchBookDetail();
     fetchBookComment();
   }, []);
 
   useEffect(() => {
+    // Calculate Average Rating
     const averageRating = () => {
       const totalRating = listComment.reduce((total, curComment) => {
         return total + curComment.rating;
       }, 0);
-      setRating(totalRating / listComment.length);
+      setRating(totalRating / listComment.length || 0);
     };
     averageRating();
   }, [listComment]);
 
   //TODO: Handle Rating Book
-  const handleAddComment = async () => {
-    const fakeComment = {
+  const handleAddComment = async (cmt: ICommentForm) => {
+    const { comment, rate } = cmt;
+    const fullComment = {
       userId: user?.id,
       bookId: bookId,
-      comment: "I love this book",
-      rating: 3,
+      comment: comment,
+      rating: rate,
       timestamp: Date(),
     };
 
     const commentDocRef = doc(collection(firebaseDB, "comments"));
     await setDoc(commentDocRef, {
       id: commentDocRef.id,
-      ...fakeComment,
+      ...fullComment,
     });
     fetchBookComment();
   };
@@ -123,6 +130,13 @@ const BookDetail = ({ navigation, route }: Props) => {
 
   return (
     <Box flex={1} bg={"#fff"}>
+      {showModal && (
+        <ModalRatingBook
+          showModal={showModal}
+          setShowModal={setShowModal}
+          submitComment={handleAddComment}
+        />
+      )}
       <ScrollView>
         <VStack w={"100%"} height={500}>
           <Box
@@ -205,7 +219,6 @@ const BookDetail = ({ navigation, route }: Props) => {
           <Text color={"grey.900"} fontSize={14}>
             {book?.description}
           </Text>
-          <Button onPress={handleAddComment}>Add Comment</Button>
           <Divider my={6} />
           <VStack>
             {listComment.map((comment) => (
@@ -214,6 +227,20 @@ const BookDetail = ({ navigation, route }: Props) => {
               </Box>
             ))}
           </VStack>
+          {isNotCommented && (
+            <Button
+              onPress={() => setShowModal(true)}
+              bgColor={"primary.Main"}
+              borderRadius={8}
+              py={3.5}
+              mt={4}
+              mb={4}
+            >
+              <Text fontWeight={"bold"} color="white" fontSize={15}>
+                Viết đánh giá
+              </Text>
+            </Button>
+          )}
         </VStack>
       </ScrollView>
     </Box>

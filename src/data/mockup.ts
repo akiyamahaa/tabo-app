@@ -1,7 +1,8 @@
 import { collection, doc, setDoc } from "firebase/firestore";
 import { firebaseDB } from "../firebase";
+import { IBook } from "../types/book";
 
-const bookData = [{}];
+const bookData: IBook[] = [];
 
 const createBook = async () => {
   const bookUpload = bookData.map(async (book) => {

@@ -1,5 +1,5 @@
 export interface IBook {
-  id: string;
+  id?: string;
   author: string;
   image: string;
   name: string;
@@ -14,4 +14,8 @@ export interface IComment {
   comment: string;
   rating: number;
   timestamp: Date;
+}
+export interface ICommentForm{
+  comment:string;
+  rate:number;
 }
