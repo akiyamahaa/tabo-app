@@ -56,7 +56,7 @@ const BookDetail = ({ navigation, route }: Props) => {
     const cloneBook: IBook = bookSnap.data() as IBook;
     await updateDoc(doc(firebaseDB, "books", bookId), {
       ...cloneBook,
-      views: cloneBook.views + 1,
+      views: cloneBook.views || 0 + 1,
     });
   };
 

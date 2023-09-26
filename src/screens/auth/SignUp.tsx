@@ -5,7 +5,7 @@ import { AuthStackParams } from "../../navigations/config";
 import { Box, Button, Center, HStack, Input, Text, VStack } from "native-base";
 import { Image } from "expo-image";
 import { useAppDispatch } from "../../store";
-import firebaseApp, { firebaseDB, firebaseAuth } from "../../firebase";
+import { firebaseDB, firebaseAuth } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { signUpError } from "../../utils/func";

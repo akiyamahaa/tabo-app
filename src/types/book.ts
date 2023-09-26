@@ -3,7 +3,8 @@ export interface IBook {
   author: string;
   image: string;
   name: string;
-  views: number;
+  views?: number;
+  category: string;
   description: string;
 }
 
@@ -15,7 +16,7 @@ export interface IComment {
   rating: number;
   timestamp: Date;
 }
-export interface ICommentForm{
-  comment:string;
-  rate:number;
+export interface ICommentForm {
+  comment: string;
+  rate: number;
 }

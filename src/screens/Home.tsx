@@ -25,9 +25,8 @@ const Home = () => {
     // TODO: Define type for book
     const queryBook = await getDocs(collection(firebaseDB, "books"));
     const books: IBook[] = [];
-    // TODO: remove id, it will added when created.
     queryBook.forEach((doc: any) => {
-      books.push({ ...doc.data(), id: doc.id });
+      books.push({ ...doc.data() });
     });
     setListBook(books);
   };
