@@ -11,28 +11,48 @@ import {
   VStack,
 } from "native-base";
 import GroupBook from "../components/GroupBook";
-import { useAppSelector } from "../store";
+import { useAppDispatch, useAppSelector } from "../store";
 import { Image } from "expo-image";
 import { collection, getDocs } from "firebase/firestore";
 import { firebaseDB } from "../firebase";
 import { IBook } from "../types/book";
+import { createBook } from "../data/mockup";
+import { removeLoading, setLoading } from "../store/loading.reducer";
 
 const Home = () => {
   const user = useAppSelector((state) => state.user.user);
+  const dispatch = useAppDispatch();
   const [listBook, setListBook] = useState<IBook[]>([]);
+
+  // filter by category
+  const mostPopularBook = listBook.sort(
+    (first, second) => second.views! - first.views!
+  );
+  const favouriteBook = listBook.filter((book) =>
+    user?.favourite.includes(book.id!)
+  );
 
   const fetchAllBook = async () => {
     // TODO: Define type for book
-    const queryBook = await getDocs(collection(firebaseDB, "books"));
-    const books: IBook[] = [];
-    queryBook.forEach((doc: any) => {
-      books.push({ ...doc.data() });
-    });
-    setListBook(books);
+    try {
+      dispatch(setLoading());
+      const queryBook = await getDocs(collection(firebaseDB, "books"));
+      const books: IBook[] = [];
+      queryBook.forEach((doc: any) => {
+        books.push({ ...doc.data() });
+      });
+      setListBook(books);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      dispatch(removeLoading());
+    }
   };
 
   useEffect(() => {
     fetchAllBook();
+    // usingg for create book
+    // createBook();
   }, []);
 
   return (
@@ -82,7 +102,6 @@ const Home = () => {
         </VStack>
       </Box>
       <VStack px={6} mt={8} space={5}>
-        <GroupBook books={listBook} />
         <GroupBook books={listBook} />
       </VStack>
     </ScrollView>

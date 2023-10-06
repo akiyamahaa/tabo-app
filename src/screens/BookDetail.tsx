@@ -14,7 +14,7 @@ import {
 import Header from "../components/Header";
 import { Image } from "expo-image";
 import { Star1, Eye } from "iconsax-react-native";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "../navigations/config";
 import { IBook, IComment, ICommentForm } from "../types/book";
@@ -34,11 +34,12 @@ import { fetchUser } from "../store/user.reducer";
 import { IUser } from "../types/user";
 import Comment from "../components/Comment";
 import ModalRatingBook from "../components/ModalRatingBook";
+import { removeLoading, setLoading } from "../store/loading.reducer";
 
 type Props = NativeStackScreenProps<RootStackParams, "BookDetail">;
 
 const BookDetail = ({ navigation, route }: Props) => {
-  const bookId = route.params.bookId;
+  const { bookId } = route.params;
   const user = useAppSelector((state) => state.user.user);
   const isFavouriteBook = user?.favourite.includes(bookId);
   const [book, setBook] = useState<IBook | null>(null);
@@ -50,14 +51,21 @@ const BookDetail = ({ navigation, route }: Props) => {
   const { colors } = useTheme();
 
   const fetchBookDetail = async () => {
-    const bookRef = doc(firebaseDB, "books", bookId);
-    const bookSnap = await getDoc(bookRef);
-    setBook(bookSnap.data() as IBook);
-    const cloneBook: IBook = bookSnap.data() as IBook;
-    await updateDoc(doc(firebaseDB, "books", bookId), {
-      ...cloneBook,
-      views: cloneBook.views || 0 + 1,
-    });
+    try {
+      dispatch(setLoading());
+      const bookRef = doc(firebaseDB, "books", bookId);
+      const bookSnap = await getDoc(bookRef);
+      setBook(bookSnap.data() as IBook);
+      const cloneBook: IBook = bookSnap.data() as IBook;
+      await updateDoc(doc(firebaseDB, "books", bookId), {
+        ...cloneBook,
+        views: (cloneBook.views || 0) + 1,
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      dispatch(removeLoading());
+    }
   };
 
   const fetchBookComment = async () => {
@@ -74,6 +82,12 @@ const BookDetail = ({ navigation, route }: Props) => {
     const check = comments.filter((cmt) => cmt.userId == user?.id);
     setIsNotCommented(!Boolean(check.length));
     setListComment(comments);
+
+    // Calculate Average Rating
+    const totalRating = comments.reduce((total, curComment) => {
+      return total + curComment.rating;
+    }, 0);
+    setRating(totalRating / comments.length || 0);
   };
 
   useEffect(() => {
@@ -81,50 +95,53 @@ const BookDetail = ({ navigation, route }: Props) => {
     fetchBookComment();
   }, []);
 
-  useEffect(() => {
-    // Calculate Average Rating
-    const averageRating = () => {
-      const totalRating = listComment.reduce((total, curComment) => {
-        return total + curComment.rating;
-      }, 0);
-      setRating(totalRating / listComment.length || 0);
-    };
-    averageRating();
-  }, [listComment]);
-
   //TODO: Handle Rating Book
   const handleAddComment = async (cmt: ICommentForm) => {
-    const { comment, rate } = cmt;
-    const fullComment = {
-      userId: user?.id,
-      bookId: bookId,
-      comment: comment,
-      rating: rate,
-      timestamp: Date(),
-    };
+    try {
+      dispatch(setLoading());
+      const { comment, rate } = cmt;
+      const fullComment = {
+        userId: user?.id,
+        bookId: bookId,
+        comment: comment,
+        rating: rate,
+        timestamp: Date(),
+      };
 
-    const commentDocRef = doc(collection(firebaseDB, "comments"));
-    await setDoc(commentDocRef, {
-      id: commentDocRef.id,
-      ...fullComment,
-    });
-    fetchBookComment();
+      const commentDocRef = doc(collection(firebaseDB, "comments"));
+      await setDoc(commentDocRef, {
+        id: commentDocRef.id,
+        ...fullComment,
+      });
+      fetchBookComment();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      dispatch(removeLoading());
+    }
   };
 
   const handleFavouriteBook = async () => {
-    if (user) {
-      let newFavourite;
-      // check isFavourite
-      if (isFavouriteBook) {
-        newFavourite = user.favourite.filter((id: string) => id !== bookId);
-      } else {
-        newFavourite = [...user.favourite, bookId];
+    try {
+      dispatch(setLoading());
+      if (user) {
+        let newFavourite;
+        // check isFavourite
+        if (isFavouriteBook) {
+          newFavourite = user.favourite.filter((id: string) => id !== bookId);
+        } else {
+          newFavourite = [...user.favourite, bookId];
+        }
+        await updateDoc(doc(firebaseDB, "users", user.id), {
+          ...user,
+          favourite: newFavourite,
+        });
+        dispatch(fetchUser(user.id || ""));
       }
-      await updateDoc(doc(firebaseDB, "users", user.id), {
-        ...user,
-        favourite: newFavourite,
-      });
-      dispatch(fetchUser(user.id || ""));
+    } catch (err) {
+      console.log(err);
+    } finally {
+      dispatch(removeLoading());
     }
   };
 

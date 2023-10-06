@@ -1,10 +1,12 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, HStack, Text, VStack, useTheme } from "native-base";
 import { Image } from "expo-image";
 import { Star1 } from "iconsax-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { IBook } from "../types/book";
+import { IBook, IComment } from "../types/book";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { firebaseDB } from "../firebase";
 
 interface Props {
   book: IBook;
@@ -17,12 +19,34 @@ const BookCard = (props: Props) => {
   const { colors } = useTheme();
   const { width = 140, height = 210, mb = 0, book } = props;
   const navigation = useNavigation<any>();
-  
+  const [rating, setRating] = useState<number>(0);
+
   const navigateDetail = () => {
     navigation.navigate("BookDetail", {
       bookId: book.id,
     });
   };
+
+  const fetchBookCommentToGetRating = async () => {
+    const q = query(
+      collection(firebaseDB, "comments"),
+      where("bookId", "==", book.id)
+    );
+    const commentSnapShot = await getDocs(q);
+    const comments: IComment[] = [];
+    commentSnapShot.forEach((doc) => {
+      comments.push(doc.data() as any);
+    });
+    const totalRating = comments.reduce((total, curComment) => {
+      return total + curComment.rating;
+    }, 0);
+    setRating(totalRating / comments.length || 0);
+  };
+
+  useEffect(() => {
+    fetchBookCommentToGetRating();
+  }, []);
+
   return (
     <Box width={width} mb={mb}>
       <TouchableOpacity onPress={navigateDetail}>
@@ -48,11 +72,9 @@ const BookCard = (props: Props) => {
                 fontWeight={"bold"}
                 color={"grey.900"}
                 marginLeft={1.5}
-              >
-                4,8
-              </Text>
+              ></Text>
               <Text fontSize={10} fontWeight={"bold"} color={"grey.300"}>
-                /
+                {rating}/
               </Text>
               <Text fontSize={10} fontWeight={"bold"} color={"grey.300"}>
                 5
