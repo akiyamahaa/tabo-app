@@ -6,9 +6,10 @@ import { IBook } from "../types/book";
 
 interface Props {
   books: IBook[];
+  title:string;
 }
 const GroupBook = (props: Props) => {
-  const { books } = props;
+  const { books,title } = props;
   const renderCardItem = useCallback(
     ({ item, index }: any) => <BookCard book={item} key={item.id} />,
     []
@@ -18,7 +19,7 @@ const GroupBook = (props: Props) => {
   return (
     <Box>
       <Text fontWeight={"bold"} color={"primary.Main"} fontSize={17} mb={3}>
-        Favorites
+        {title}
       </Text>
       <FlatList
         data={books.slice(0, 6)}

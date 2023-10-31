@@ -7,11 +7,12 @@ import { useAppSelector } from "../store";
 import { IBook } from "../types/book";
 import { doc, getDoc } from "firebase/firestore";
 import { firebaseDB } from "../firebase";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 const Favourite = () => {
   const user = useAppSelector((state) => state.user.user);
   const [listBook, setListBook] = useState<IBook[]>([]);
+  const isFocused = useIsFocused()
 
   const fetchFavouriteBook = async () => {
     const list: any = [];
@@ -25,9 +26,9 @@ const Favourite = () => {
     setListBook(list);
   };
 
-  useFocusEffect(() => {
+  useEffect(() => {
     fetchFavouriteBook();
-  });
+  }, [isFocused]);
 
   return (
     <Box flex={1}>

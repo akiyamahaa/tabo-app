@@ -9,13 +9,15 @@ import { removeLoading, setLoading } from "../store/loading.reducer";
 import { collection, getDocs } from "firebase/firestore";
 import { firebaseDB } from "../firebase";
 import { IBook } from "../types/book";
+import { getRandom } from "../utils/func";
+import { useIsFocused } from "@react-navigation/native";
 
 const BookCardSearch = (props: { book: IBook }) => {
   const { book } = props;
   return (
     <HStack space={1} justifyContent={"space-between"} m={2}>
       <Image
-        source={{ uri: book.image }}
+        source={{ uri: book.img }}
         style={{ width: 80, height: 80, borderRadius: 8 }}
       />
       <VStack justifyContent={"center"} flex={1}>
@@ -48,6 +50,7 @@ const Search = () => {
   const [listBook, setListBook] = useState<IBook[]>([]);
   const [filterBook, setFilterBook] = useState<IBook[]>([]);
   const [textSearch, setTextSearch] = useState("");
+  const isFocused = useIsFocused();
 
   const fetchAllBook = async () => {
     // TODO: Define type for book
@@ -59,7 +62,7 @@ const Search = () => {
         books.push({ ...doc.data() });
       });
       setListBook(books);
-      setFilterBook(books);
+      setFilterBook(getRandom(books,5));
     } catch (err) {
       console.log(err);
     } finally {
@@ -83,7 +86,7 @@ const Search = () => {
 
   useEffect(() => {
     fetchAllBook();
-  }, []);
+  }, [isFocused]);
 
   return (
     <Box flex={1} bgColor={"#fff"}>

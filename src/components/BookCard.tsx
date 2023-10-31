@@ -20,6 +20,7 @@ const BookCard = (props: Props) => {
   const { width = 140, height = 210, mb = 0, book } = props;
   const navigation = useNavigation<any>();
   const [rating, setRating] = useState<number>(0);
+  console.log("book", book);
 
   const navigateDetail = () => {
     navigation.navigate("BookDetail", {
@@ -53,7 +54,7 @@ const BookCard = (props: Props) => {
         <VStack>
           <Box position={"relative"} bgColor={"amber.100"} mb={2.5}>
             <Image
-              source={{ uri: book.image }}
+              source={{ uri: book.img }}
               style={{ width: "100%", height }}
               contentFit="cover"
             />

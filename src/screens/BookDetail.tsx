@@ -164,7 +164,7 @@ const BookDetail = ({ navigation, route }: Props) => {
             backgroundColor={"amber.100"}
           >
             <Image
-              source={{ uri: book?.image }}
+              source={{ uri: book?.img }}
               contentFit="cover"
               style={{
                 width: "100%",
@@ -189,7 +189,7 @@ const BookDetail = ({ navigation, route }: Props) => {
           />
           <Center mt={4}>
             <Image
-              source={{ uri: book?.image }}
+              source={{ uri: book?.img }}
               style={{ width: 160, height: 210 }}
               contentFit="fill"
             />

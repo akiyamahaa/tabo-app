@@ -1,7 +1,7 @@
 export interface IBook {
   id?: string;
   author: string;
-  image: string;
+  img: string;
   name: string;
   views?: number;
   category: string;

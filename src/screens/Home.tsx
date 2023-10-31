@@ -16,13 +16,14 @@ import { Image } from "expo-image";
 import { collection, getDocs } from "firebase/firestore";
 import { firebaseDB } from "../firebase";
 import { IBook } from "../types/book";
-import { createBook } from "../data/mockup";
 import { removeLoading, setLoading } from "../store/loading.reducer";
+import { useIsFocused } from "@react-navigation/native";
 
 const Home = () => {
   const user = useAppSelector((state) => state.user.user);
   const dispatch = useAppDispatch();
   const [listBook, setListBook] = useState<IBook[]>([]);
+  const isFocused = useIsFocused();
 
   // filter by category
   const mostPopularBook = listBook.sort(
@@ -53,7 +54,7 @@ const Home = () => {
     fetchAllBook();
     // usingg for create book
     // createBook();
-  }, []);
+  }, [isFocused]);
 
   return (
     <ScrollView flex={1} bgColor={"#fff"}>
@@ -102,7 +103,9 @@ const Home = () => {
         </VStack>
       </Box>
       <VStack px={6} mt={8} space={5}>
-        <GroupBook books={listBook} />
+        <GroupBook books={listBook} title="Latest" />
+        <GroupBook books={mostPopularBook} title="Popular" />
+        <GroupBook books={favouriteBook} title="Favourite" />
       </VStack>
     </ScrollView>
   );

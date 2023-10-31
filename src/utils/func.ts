@@ -28,3 +28,7 @@ export const signInError = (err: any, email: string) => {
   }
 };
 
+export const getRandom = (arr: any, n: number) => {
+  // Tạo mảng con ngẫu nhiên
+  return arr.slice(0, n).sort(() => Math.random() - 0.5);
+};
