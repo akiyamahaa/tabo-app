@@ -25,12 +25,13 @@ TaboApp is an application that reviews foreign literature books. The application
 - Rating
 
 ## Screenshots
-
+<p float='left'>
 <img src="images/image1.png" width="40%" alt='screen1'>
 <img src="images/image2.png" width="40%" alt='screen1'>
 <img src="images/image3.png" width="40%" alt='screen1'>
 <img src="images/image4.png" width="40%" alt='screen1'>
 <img src="images/image5.png" width="40%" alt='screen1'>
+</p>
 
 ## Getting Started
 
