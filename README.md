@@ -1,7 +1,7 @@
 # Tabo App
 
 ## Demo App
-https://drive.google.com/file/d/1rzpQzCs642v4UIQn9d2vALdfHPNu_Hme/view?usp=sharing
+Link demo
 ## Table of Contents
 - [Tabo App](#tabo-app)
   - [Demo App](#demo-app)
